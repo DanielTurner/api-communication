@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "ES6 Class for API communication",
   "author": "Daniel Turner",
-  "license": "license.txt",
+  "license": "MIT",
   "main": "index.js",
   "module": "index.js",
   "scripts": {
