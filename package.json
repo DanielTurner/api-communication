@@ -1,0 +1,46 @@
+{
+  "name": "api-communication",
+  "version": "1.0.0",
+  "description": "ES6 Class for API communication",
+  "author": "Daniel Turner",
+  "license": "license.txt",
+  "main": "index.js",
+  "module": "index.js",
+  "scripts": {
+    "lint:eslint": "eslint --ext .js,.html . --ignore-path .gitignore",
+    "format:eslint": "eslint --ext .js,.html . --fix --ignore-path .gitignore",
+    "lint": "npm run lint:eslint",
+    "format": "npm run format:eslint"
+  },
+  "dependencies": {
+    "lit-element": "^2.0.1",
+    "lit-html": "^1.0.0"
+  },
+  "devDependencies": {
+    "@open-wc/eslint-config": "^1.0.0",
+    "es-dev-server": "^1.5.0",
+    "eslint": "^6.1.0",
+    "eslint-config-google": "^0.14.0",
+    "eslint-plugin-lit": "^1.2.0",
+    "husky": "^1.0.0",
+    "lint-staged": "^8.0.0",
+    "webpack-merge": "^4.1.5"
+  },
+  "eslintConfig": {
+    "extends": [
+      "@open-wc/eslint-config",
+      "google"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.js": [
+      "eslint --fix",
+      "git add"
+    ]
+  }
+}
