@@ -35,13 +35,13 @@ You can set the names of these events as they are attributes on the class.
 
 Set the properties you need for the current call
 ```javascript
-this.apiCommunication.cache = 'no-cache';
-this.apiCommunication.method = 'GET';
+this.communication.cache = 'no-cache';
+this.communication.method = 'GET';
 ```
 ### Firing the request
 Then fire the action
 ```javascript 
-this.apiCommunication.fire();
+this.communication.fire();
 ```
 
 ### Getting a response
