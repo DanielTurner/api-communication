@@ -1,7 +1,20 @@
 {
   "name": "api-communication",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "ES6 Class for API communication",
+  "repository": {
+    "type" : "git",
+    "url" : "https://github.com/DanielTurner/api-communication"
+  },
+  "bugs": "https://github.com/DanielTurner/api-communication/issues",
+  "keywords": [
+    "api",
+    "communication",
+    "class",
+    "es module",
+    "lit-element",
+    "open-wc"
+  ],
   "author": "Daniel Turner",
   "license": "MIT",
   "main": "index.js",
