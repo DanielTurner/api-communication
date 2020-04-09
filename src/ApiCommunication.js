@@ -7,10 +7,11 @@ export class ApiCommunication {
    */
   constructor() {
     this.body = {};
+    this.browser = navigator;
     this.cache = 'no-cache';
     this.contentType = 'application/json; charset=utf-8';
     this.credentials = 'omit';
-    this.eventTarget = {};
+    this.eventTarget = window;
     this.failureEvent = 'failure';
     this.headers = {};
     this.id = '';
@@ -21,15 +22,18 @@ export class ApiCommunication {
     this.successEvent = 'success';
     this.url = '';
     this.localStorageName = `apiCommunication_${this.id}`;
-    this.addEventListener('fire', (event) => (this.fired()), false);
-    window.addEventListener('online', updateOnlineStatus);
-    window.addEventListener('offline', updateOnlineStatus);
+    window.addEventListener('online', () => {
+      this.updateOnlineStatus();
+    });
+    window.addEventListener('offline', () => {
+      this.updateOnlineStatus();
+    });
   }
 
   /**
    */
-  async fired() {
-    this.response = await this.sendRequest(null, { onLine: !this.isOffline });
+  async fire() {
+    this.response = await this.sendRequest(null, this.browser);
     return this.response;
   }
 
@@ -51,15 +55,14 @@ export class ApiCommunication {
       const response = await fetch(request);
       if (!response.ok) {
         if (!existingRequest) {
-          this.notifyFailure(request);
+          const failedRequest = { ...{ request }, ...{ response } };
+          this.notifyFailure(failedRequest);
         }
         return null;
       }
       const json = await response.json();
       const successRequest = { ...{ request }, ...{ response: json } };
-      if (!existingRequest) {
-        this.notifySuccess(successRequest);
-      }
+      this.notifySuccess(successRequest);
       return successRequest;
     } catch (error) {
       // eslint-disable-next-line
@@ -113,7 +116,7 @@ export class ApiCommunication {
     currentRequests.push({ ...newRequest });
     localStorage.setItem(
         this.localStorageName,
-        JSON.stringify(currentRequests)
+        JSON.stringify(currentRequests),
     );
   }
 
@@ -123,25 +126,24 @@ export class ApiCommunication {
     // Check time past has elapsed before trying again.
     if (this.isOffline) return;
     let currentRequests = localStorage.getItem(this.localStorageName);
+
     if (currentRequests !== null) {
       currentRequests = JSON.parse(currentRequests);
     } else {
       return;
     }
-
     const failures = [];
     // eslint-disable-next-line
     for (const request of currentRequests) {
       // eslint-disable-next-line
-      if (ApiCommunication._getOfflineStatus(checker)) {
+      if (!ApiCommunication._getOfflineStatus(this.browser)) {
+        // eslint-disable-next-line no-await-in-loop
         const response = await this.sendRequest(
-            new Request(request.url, request.init)
+            new Request(request.url, request.init),
         );
         if (!response) {
           this.notifyFailure(request);
           failures.push(request);
-        } else {
-          this.notifySuccess(request);
         }
       } else {
         failures.push(request);
@@ -167,7 +169,7 @@ export class ApiCommunication {
               detail: data,
               url: this.url,
               id: this.id,
-            })
+            }),
     );
   }
 
@@ -183,7 +185,7 @@ export class ApiCommunication {
               detail: data,
               url: this.url,
               id: this.id,
-            })
+            }),
     );
   }
 
@@ -191,10 +193,10 @@ export class ApiCommunication {
    */
   updateOnlineStatus() {
     const oldValue = this.isOffline;
-    this.isOffline = ApiCommunication._getOfflineStatus(checker);
+    this.isOffline = ApiCommunication._getOfflineStatus(this.browser);
 
-    if(!this.isOffline) {
-      if(this.isOffline !== oldValue) {
+    if (!this.isOffline) {
+      if (this.isOffline !== oldValue) {
         this.processQueue();
       }
     }
