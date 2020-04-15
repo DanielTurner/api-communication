@@ -1,6 +1,6 @@
 {
   "name": "api-communication",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "ES6 Class for API communication",
   "repository": {
     "type" : "git",
