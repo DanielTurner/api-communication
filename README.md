@@ -6,7 +6,7 @@ This class bridges a small part of the offline gap allowing requests that occur 
 ## Usage
 Get the package from npm
 ```npm
-npm i @danielturner/api-communication
+npm i api-communication
 ```
 
 ### Setup
