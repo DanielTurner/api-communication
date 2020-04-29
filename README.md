@@ -1,6 +1,6 @@
 # API Communication
 Most web applications communicate with a server, but once the app is built often offline has not been considered.
-This class bridges a small part of the offline gap allowing requests that occur when the useris offline to be stored in the browser localstorage.
+This class bridges a small part of the offline gap allowing requests that occur when the user is offline to be stored in the browser localstorage.
 
 
 ## Usage
