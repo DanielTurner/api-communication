@@ -1,11 +1,15 @@
 {
   "name": "api-communication",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "ES6 Class for API communication",
   "repository": {
-    "type" : "git",
-    "url" : "https://github.com/DanielTurner/api-communication"
+    "type": "git",
+    "url": "https://github.com/DanielTurner/api-communication"
   },
+  "engines": {
+    "node": ">=24.14.0"
+  },
+  "type": "module",
   "bugs": "https://github.com/DanielTurner/api-communication/issues",
   "keywords": [
     "api",
@@ -20,21 +24,15 @@
   "main": "index.js",
   "module": "index.js",
   "scripts": {
-    "lint:eslint": "eslint --ext .js,.html . --ignore-path .gitignore",
-    "format:eslint": "eslint --ext .js,.html . --fix --ignore-path .gitignore",
-    "lint": "npm run lint:eslint",
-    "format": "npm run format:eslint"
-  },
-  "devDependencies": {
-    "@open-wc/eslint-config": "^2.0.4",
-    "eslint": "^6.8.0",
-    "eslint-config-google": "^0.14.0",
-    "husky": "^4.2.3",
-    "lint-staged": "^10.1.2"
+    "format": "npx eslint --ext .js,.html . --fix --ignore-path .gitignore",
+    "publish": "npm publish",
+    "lint": "npx eslint . --ext .js",
+    "lint:fix": "npx eslint . --ext .js --fix",
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest",
+    "test:coverage": "NODE_OPTIONS=--experimental-vm-modules jest --coverage"
   },
   "eslintConfig": {
     "extends": [
-      "@open-wc/eslint-config",
       "google"
     ]
   },
@@ -48,5 +46,12 @@
       "eslint --fix",
       "git add"
     ]
+  },
+  "devDependencies": {
+    "eslint": "^10.0.3",
+    "eslint-config-google": "^0.14.0",
+    "eslint-plugin-jsdoc": "^62.7.1",
+    "globals": "^17.4.0",
+    "jest": "^30.2.0"
   }
 }

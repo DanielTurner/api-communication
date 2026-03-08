@@ -1,0 +1,52 @@
+name: Lint, Test & Publish to npm
+
+on:
+  push:
+    branches:
+      - master   # Trigger on direct push to master (or merge into master)
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint code
+        run: npm run lint   # Add this script if missing (see below)
+
+      - name: Run tests
+        run: npm test
+
+  publish:
+    needs: lint-and-test   # Only run if lint + test pass
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write   # Required for Trusted Publishing
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Publish to npm
+        run: npm publish --access public --provenance
