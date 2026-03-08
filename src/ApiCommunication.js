@@ -1,11 +1,11 @@
 /**
  * @class ApiCommunication
- * @extends LitElement
  */
 export class ApiCommunication {
   /**
+   * @param { string } id - Identifier
    */
-  constructor() {
+  constructor(id) {
     this.body = {};
     this.browser = navigator;
     this.cache = 'no-cache';
@@ -14,7 +14,7 @@ export class ApiCommunication {
     this.eventTarget = window;
     this.failureEvent = 'failure';
     this.headers = {};
-    this.id = '';
+    this.id = id || Math.random().toString(36).substring(2, 9);
     this.isOffline = false;
     this.method = 'GET';
     this.mode = 'cors';
@@ -31,6 +31,7 @@ export class ApiCommunication {
   }
 
   /**
+   * @returns {Promise | null} - response
    */
   async fire() {
     this.response = await this.sendRequest(null, this.browser);
@@ -39,17 +40,17 @@ export class ApiCommunication {
 
   /**
    * @param {Request} existingRequest any pre-existing request object
-   * @param {Object} checker the object holding the offline status
-   * @return {Promise|null} response
+   * @param {object} checker the object holding the offline status
+   * @returns {Promise|null} response
    */
   async sendRequest(existingRequest = null, checker = navigator) {
     if (ApiCommunication._getOfflineStatus(checker)) {
       this.queueRequest();
       return null;
     }
-    // eslint-disable-next-line
+     
     let request = existingRequest ? existingRequest :
-        this._createNewRequest();
+      this._createNewRequest();
 
     try {
       const response = await fetch(request);
@@ -72,16 +73,16 @@ export class ApiCommunication {
   }
 
   /**
-   * @param {Object} browser
-   * @return {Boolean}
+   * @param {object} browser - web browser
+   * @returns {boolean} - offline status
    */
   static _getOfflineStatus(browser = navigator) {
     return !browser.onLine;
   }
 
   /**
-   * @param {Boolean} queued
-   * @return {Request}
+   * @param {boolean} queued - Is queued
+   * @returns {Request} - Request
    */
   _createNewRequest(queued) {
     const myInitObject = {
@@ -108,16 +109,27 @@ export class ApiCommunication {
     let currentRequests = localStorage.getItem(this.localStorageName);
     if (currentRequests && currentRequests.length &&
         currentRequests.length > 0) {
-      currentRequests = JSON.parse(currentRequests);
+      try {
+        currentRequests = JSON.parse(currentRequests);
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.error('Failed to parse localStorage data:', e);
+        currentRequests = [];
+      }
     } else {
       currentRequests = [];
     }
     const newRequest = this._createNewRequest(true);
     currentRequests.push({ ...newRequest });
-    localStorage.setItem(
+    try {
+      localStorage.setItem(
         this.localStorageName,
         JSON.stringify(currentRequests),
-    );
+      );
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error('Failed to set localStorage data:', e);
+    }
   }
 
   /**
@@ -127,19 +139,28 @@ export class ApiCommunication {
     if (this.isOffline) return;
     let currentRequests = localStorage.getItem(this.localStorageName);
 
-    if (currentRequests !== null) {
-      currentRequests = JSON.parse(currentRequests);
+    if(currentRequests === null) {
+      currentRequests = [];
     } else {
-      return;
+
+      try {
+        currentRequests = JSON.parse(currentRequests);
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.error('Invalid queue data in the localStorage: ', e);
+        localStorage.removeItem(this.localStorageName);
+        return;
+      }
     }
+
     const failures = [];
-    // eslint-disable-next-line
+     
     for (const request of currentRequests) {
-      // eslint-disable-next-line
+       
       if (!ApiCommunication._getOfflineStatus(this.browser)) {
-        // eslint-disable-next-line no-await-in-loop
+         
         const response = await this.sendRequest(
-            new Request(request.url, request.init),
+          new Request(request.url, request.init),
         );
         if (!response) {
           this.notifyFailure(request);
@@ -153,39 +174,39 @@ export class ApiCommunication {
     if (failures.length) {
       localStorage.setItem(this.localStorageName, JSON.stringify(failures));
     } else {
-      localStorage.setItem(this.localStorageName, []);
+      localStorage.setItem(this.localStorageName,'[]');
     }
   }
 
   /**
-   * @param {Object} data the changed data
+   * @param {object} data - the changed data
    */
   notifySuccess(data) {
     if (ApiCommunication._isObjectEmpty(this.eventTarget)) return;
     this.eventTarget.dispatchEvent(
-        new CustomEvent(this.successEvent,
-            {
-              bubbles: true,
-              detail: data,
-              url: this.url,
-              id: this.id,
-            }),
+      new CustomEvent(this.successEvent,
+        {
+          bubbles: true,
+          detail: data,
+          url: this.url,
+          id: this.id,
+        }),
     );
   }
 
   /**
-   * @param {*} data
+   * @param { object | string | number } data - Any data
    */
   notifyFailure(data) {
     if (ApiCommunication._isObjectEmpty(this.eventTarget)) return;
     this.eventTarget.dispatchEvent(
-        new CustomEvent(this.failureEvent,
-            {
-              bubbles: true,
-              detail: data,
-              url: this.url,
-              id: this.id,
-            }),
+      new CustomEvent(this.failureEvent,
+        {
+          bubbles: true,
+          detail: data,
+          url: this.url,
+          id: this.id,
+        }),
     );
   }
 
@@ -203,8 +224,8 @@ export class ApiCommunication {
   }
 
   /**
-   * @param {Object} obj
-   * @return {Boolean}
+   * @param {object} obj - Object
+   * @returns {boolean} - If is empty
    */
   static _isObjectEmpty(obj) {
     return Object.entries(obj).length === 0 && obj.constructor === Object;

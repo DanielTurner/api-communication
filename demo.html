@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ApiCommunication Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+
+        p {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        button {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 16px;
+            color: #fff;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #queue {
+            background-color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-width: 100%;
+            overflow-x: auto;
+        }
+    </style>
+    <script type="module">
+        import { ApiCommunication } from './src/ApiCommunication.js';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const apiComm = new ApiCommunication('1');
+            apiComm.url = 'https://jsonplaceholder.typicode.com/todos/1';
+
+            let pollingInterval = null;
+
+            function displayQueue() {
+                const queue = JSON.parse(localStorage.getItem(apiComm.localStorageName)) || [];
+                document.getElementById('queue').innerText = JSON.stringify(queue, null, 2);
+            }
+
+            document.getElementById('fireBtn').addEventListener('click', () => {
+                apiComm.fire();
+                displayQueue();
+            });
+
+            // Start Polling
+            function startPolling() {
+                if (pollingInterval) {
+                    clearInterval(pollingInterval);
+                }
+                pollingInterval = setInterval(displayQueue, 1000);
+            }
+
+            function stopPolling() {
+                if (pollingInterval) {
+                    clearInterval(pollingInterval);
+                    pollingInterval = null;
+                }
+            }
+
+            displayQueue();
+            startPolling();
+
+        });
+    </script>
+</head>
+<body>
+    <h1>ApiCommunication Demo</h1>
+    <p>Test the API communication functionality.</p>
+    <p>Turn your browser networking to offline to simulate true offline, then press the fire request to fire request to a backend server, toggle networking back on and watch the queue get processed.</p>
+
+    <div style="text-align: center;">
+        <button id="fireBtn">Fire Request</button>
+    </div>
+
+    <h2>Current Queue:</h2>
+    <pre id="queue"></pre>
+</body>
+</html>
